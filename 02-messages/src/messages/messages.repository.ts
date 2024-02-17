@@ -1,5 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
+import { Injectable, NotFoundException } from "@nestjs/common";
 
+@Injectable()
 export class MessagesRepository {
 
     async findAll() {
@@ -10,6 +12,9 @@ export class MessagesRepository {
 
     async findOne(id: string) {
         const messages = await this.findAll();
+        const message = messages[id];
+        if(!messages[id])
+            throw new NotFoundException("Message not found!");
         return messages[id];
     }
 

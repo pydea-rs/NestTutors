@@ -4,12 +4,8 @@ import { MessagesService } from './messages.service';
 
 @Controller('messages')
 export class MessagesController {
-    messagesService: MessagesService;
 
-    constructor() {
-        // wrong technique. temporary
-        this.messagesService = new MessagesService();
-    }
+    constructor(private messagesService: MessagesService) { } //, private messagesService2: MessagesService, private messagesService3: MessagesService) { }
 
     @Get()
     async getMessages() {
@@ -26,7 +22,7 @@ export class MessagesController {
     @Get('/:id')
     getSingleMessage(@Param('id') id: string) {
         console.log(id);
-        
+
         return id;
     }
 }
