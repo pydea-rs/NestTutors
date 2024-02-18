@@ -18,4 +18,5 @@ export class UserService {
     createDirectly(username: string, email: string, password: string) {
         return this.userRepository.save({username, password, email}); // This works too
     }
+    
 }
