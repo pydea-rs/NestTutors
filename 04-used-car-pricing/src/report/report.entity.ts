@@ -14,5 +14,6 @@ export class Report {
     @Column()
     color: string;
 
-    
+    // @Column()
+    // sellerId: string; // ForeinKey?!
 }

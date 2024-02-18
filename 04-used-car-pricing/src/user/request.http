@@ -1,0 +1,9 @@
+### Create Report:
+POST http://localhost:4000/user/register
+Content-Type: application/json
+
+{
+    "email": "whatever@gmail.com",
+    "username": "what",
+    "password": "evAAer_1"
+}
