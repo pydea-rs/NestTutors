@@ -1,4 +1,4 @@
-import { UserSerializerInterceptor } from './../interceptors/user-serialize.interceptor';
+import { NoCredentialsUserSerialize, UserSerializerInterceptor } from './../interceptors/user-serialize.interceptor';
 import { EntityNotFoundException } from './../exceptions/entity-not-found.exception';
 import {
   Body,
@@ -17,10 +17,13 @@ import { UserService } from './user.service';
 import { PostUserDto } from 'src/dtos/post-user.dto';
 import { User } from './user.entity';
 import { PatchUserDto } from 'src/dtos/patch-user.dto.';
+import { UserDto } from 'src/dtos/user.dto';
 
 
 @Controller('user')
-@UseInterceptors(UserSerializerInterceptor)
+// @UseInterceptors(new UserSerializerInterceptor(UserDto))
+@NoCredentialsUserSerialize(UserDto)
+
 export class UserController {
   constructor(private userService: UserService) {}
 
