@@ -7,7 +7,7 @@ import { UserDto } from "src/dtos/user.dto";
 export class UserSerializerInterceptor implements NestInterceptor {
     
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
-        console.log('Runs before request is handled by route handler.')
+        console.log('Runs before request is handled by route handler.', context)
         // Whatever runs before handler
         
         return next.handle().pipe(

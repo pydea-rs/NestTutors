@@ -20,6 +20,7 @@ import { PatchUserDto } from 'src/dtos/patch-user.dto.';
 
 
 @Controller('user')
+@UseInterceptors(UserSerializerInterceptor)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -32,7 +33,7 @@ export class UserController {
   }
 
   // @UseInterceptors(ClassSerializerInterceptor)
-  @UseInterceptors(UserSerializerInterceptor)
+  // @UseInterceptors(UserSerializerInterceptor)
   @Get('/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.userService.findOne(+id); // or parseInt
