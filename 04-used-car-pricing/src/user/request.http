@@ -7,3 +7,33 @@ Content-Type: application/json
     "username": "what",
     "password": "evAAer_1"
 }
+
+### Get a specific user by id
+GET http://localhost:4000/user/2
+
+### Get users with specific username
+GET http://localhost:4000/user?username=what
+
+### Get users with specific email
+GET http://localhost:4000/user?email=whatever@gmail.com
+
+
+### Update a user
+PATCH http://localhost:4000/user/2
+Content-Type: application/json
+
+{
+    "password": "This_x_WHatevr3"
+}
+
+### Update a user, multiple changes:
+PATCH http://localhost:4000/user/2
+Content-Type: application/json
+
+{
+    "email": "another@gmail.com",
+    "username": "whatever"
+}
+
+### Delete a user
+DELETE http://localhost:4000/user/2
