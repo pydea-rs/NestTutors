@@ -1,6 +1,6 @@
 import { IsEmail, IsOptional, IsString, IsStrongPassword } from "class-validator";
 
-export class UpdateUserDto {
+export class PatchUserDto {
     @IsString()
     @IsOptional()
     username: string;

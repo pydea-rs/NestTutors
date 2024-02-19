@@ -1,7 +1,7 @@
 import { IsNumber, IsRgbColor, IsString } from "class-validator";
 
 
-export class ReportDto {
+export class PostReportDto {
     @IsNumber()
     price: number;
 

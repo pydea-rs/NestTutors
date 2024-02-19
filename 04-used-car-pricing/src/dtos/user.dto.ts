@@ -1,12 +1,13 @@
-import { IsEmail, IsString, IsStrongPassword } from "class-validator";
+import { Expose } from "class-transformer";
+
 
 export class UserDto {
-    @IsString()
+    @Expose()
     username: string;
 
-    @IsString() @IsEmail()
+    @Expose()
     email: string;
 
-    @IsString() @IsStrongPassword()
-    password: string;
+    @Expose()
+    id: number;
 }

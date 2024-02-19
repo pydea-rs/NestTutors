@@ -1,3 +1,4 @@
+import { UserSerializerInterceptor } from './../interceptors/user-serialize.interceptor';
 import { EntityNotFoundException } from './../exceptions/entity-not-found.exception';
 import {
   Body,
@@ -13,24 +14,25 @@ import {
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from 'src/dtos/user.dto';
+import { PostUserDto } from 'src/dtos/post-user.dto';
 import { User } from './user.entity';
-import { UpdateUserDto } from 'src/dtos/update-user.dto.';
+import { PatchUserDto } from 'src/dtos/patch-user.dto.';
 
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   @Post('/register')
-  register(@Body() body: UserDto) {
+  register(@Body() body: PostUserDto) {
     const { username, password, email } = body;
     return this.userService.create(username, email, password);
     // return this.userService.createDirectly(username, password, email);  // Just for tutorial purposes
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(UserSerializerInterceptor)
   @Get('/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.userService.findOne(+id); // or parseInt
@@ -40,7 +42,7 @@ export class UserController {
     return user;
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   async getSomeUsers(
     @Query('username') username: string,
@@ -68,9 +70,9 @@ export class UserController {
     return users;
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
-  async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
+  async updateUser(@Param('id') id: string, @Body() body: PatchUserDto) {
     try {
       const user = await this.userService.update(+id, body);
     //   delete user.password; // removing delete password section, cause of using Exclude and CLassSerializerInterceptor
@@ -82,7 +84,7 @@ export class UserController {
     return null;
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   @Delete('/:id')
   async deleteUser(@Param('id') id: string) {
     try {
