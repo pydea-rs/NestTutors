@@ -4,13 +4,16 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { UserDto } from "src/dtos/user.dto";
 
-export function NoCredentialsUserSerialize(dtoProtoType: any) {
+interface DtoTypeAnnotation { // this is used for type annotaion dtoPrototype in UserSerializerInterceptor
+    new (...args: any[]): {}
+}
+export function NoCredentialsUserSerialize(dtoProtoType: DtoTypeAnnotation) {
     return UseInterceptors(new UserSerializerInterceptor(dtoProtoType));
 }
 
 export class UserSerializerInterceptor implements NestInterceptor {
     
-    constructor(private dtoProtoType: any) {}
+    constructor(private dtoProtoType: DtoTypeAnnotation) {}
 
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
         console.log('Runs before request is handled by route handler.', context)

@@ -18,6 +18,7 @@ import { PostUserDto } from 'src/dtos/post-user.dto';
 import { User } from './user.entity';
 import { PatchUserDto } from 'src/dtos/patch-user.dto.';
 import { UserDto } from 'src/dtos/user.dto';
+import { JustNameUserDto } from 'src/dtos/just-name-user.dto';
 
 
 @Controller('user')
@@ -89,6 +90,7 @@ export class UserController {
   }
 
   // @UseInterceptors(ClassSerializerInterceptor)
+  @NoCredentialsUserSerialize(JustNameUserDto)
   @Delete('/:id')
   async deleteUser(@Param('id') id: string) {
     try {
