@@ -16,7 +16,7 @@ export class UserSerializerInterceptor implements NestInterceptor {
     constructor(private dtoProtoType: DtoTypeAnnotation) {}
 
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
-        console.log('Runs before request is handled by route handler.', context)
+        console.log('Runs before request is handled by route handler.')//, context)
         // Whatever runs before handler
         
         return next.handle().pipe(

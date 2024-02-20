@@ -24,7 +24,7 @@ export class UserService {
         return this.userRepository.findOneBy({id});
     }
     
-    find(searchParam: Partial<User>) {
+    find(searchParam: Partial<User>): Promise<User[]> {
         const {username, email} = searchParam;
         // Notice: Actually, this search must be returned as One, but as Uniqueness of email/username has not been implemented,
         // for now its implemented this way ...
@@ -33,7 +33,7 @@ export class UserService {
         if(email)
             return this.userRepository.findBy({email});
 
-        return [];
+        return Promise.resolve([]);
     }
 
     async update(id: number, fields: Partial<User>) {
