@@ -20,7 +20,8 @@ import {
   ConflictException,
   UnauthorizedException,
   Res,
-  HttpStatus
+  HttpStatus,
+  Request
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PostUserDto } from 'src/dtos/post-user.dto';
@@ -32,10 +33,12 @@ import { AuthService } from './auth.service';
 import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
 import { Response } from 'express';
 import { LoginUserDto } from 'src/dtos/login-user.dto';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 
 @Controller('user')
 // @UseInterceptors(new UserSerializerInterceptor(UserDto))
 @NoCredentialsUserSerialize(UserDto)
+@UseInterceptors(CurrentUserInterceptor)
 export class UserController {
   constructor(
     private userService: UserService,
@@ -128,16 +131,12 @@ export class UserController {
   }
 
   @Get('/whoami')
-  async whoami(@Session() session: any) {
+  async whoami(@Request() request: any, @Session() session: any) {
     if (!session.userID)
       throw new UnauthorizedException(
         'You are not logged in to find out who you are!',
       );
-    const { userID } = session;
-    const user = await this.userService.findOne(userID);
-    if(!user)
-        throw new NotFoundException('User not found');
-    return user;
+    return request.currentUser;
   }
   // @UseInterceptors(ClassSerializerInterceptor)
   // @UseInterceptors(UserSerializerInterceptor)

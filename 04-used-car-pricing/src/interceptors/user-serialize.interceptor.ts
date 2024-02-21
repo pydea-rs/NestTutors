@@ -2,7 +2,6 @@ import { CallHandler, ExecutionContext, NestInterceptor, UseInterceptors } from 
 import { plainToClass, plainToInstance } from "class-transformer";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { UserDto } from "src/dtos/user.dto";
 
 interface DtoTypeAnnotation { // this is used for type annotaion dtoPrototype in UserSerializerInterceptor
     new (...args: any[]): {}
