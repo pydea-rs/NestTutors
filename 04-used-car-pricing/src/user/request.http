@@ -1,18 +1,34 @@
-### Create Report:
+### Create/Register user:
 POST http://localhost:4000/user/register
 Content-Type: application/json
 
 {
-    "email": "test@gmail.com",
-    "username": "test",
-    "password": "evAAer_1"
+    "email": "test2@gmail.com",
+    "username": "test2",
+    "password": "whaTeve_2r"
 }
 
 ### Get a specific user by id
-GET http://localhost:4000/user/3
+GET http://localhost:4000/user/2
 
 ### Login user:
-GET http://localhost:4000/user/login?email=test@gmail.com&&password=evAAer_1
+GET http://localhost:4000/user/login?username=test2&&password=whaTeve_2r
+
+
+### Tell me who am i?
+GET http://localhost:4000/user/whoami
+
+### Log out
+POST http://localhost:4000/user/logout
+
+### lLogin By Post
+POST http://localhost:4000/user/login
+Content-Type: application/json
+
+{
+    "email": "test2@gmail.com",
+    "password": "whaTeve_2r"
+}
 
 ### Get users with specific username
 GET http://localhost:4000/user?username=what

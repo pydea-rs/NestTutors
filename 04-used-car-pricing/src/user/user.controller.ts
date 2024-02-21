@@ -16,15 +16,22 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   ForbiddenException,
+  Session,
+  ConflictException,
+  UnauthorizedException,
+  Res,
+  HttpStatus
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PostUserDto } from 'src/dtos/post-user.dto';
 import { User } from './user.entity';
-import { PatchUserDto } from 'src/dtos/patch-user.dto.';
+import { PatchUserDto } from 'src/dtos/patch-user.dto';
 import { UserDto } from 'src/dtos/user.dto';
 import { JustNameUserDto } from 'src/dtos/just-name-user.dto';
 import { AuthService } from './auth.service';
 import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
+import { Response } from 'express';
+import { LoginUserDto } from 'src/dtos/login-user.dto';
 
 @Controller('user')
 // @UseInterceptors(new UserSerializerInterceptor(UserDto))
@@ -37,10 +44,12 @@ export class UserController {
 
   // @UseInterceptors(ClassSerializerInterceptor)
   @Post('/register')
-  async register(@Body() body: PostUserDto) {
+  async register(@Body() body: PostUserDto, @Session() session: any) {
+    if (session.userID) throw new ConflictException('You are logged in.');
     const { username, password, email } = body;
     try {
       const user = await this.authService.register(username, email, password);
+      session.userID = user.id;
       return user;
     } catch (ex) {
       if (ex instanceof EntityExistsException)
@@ -55,24 +64,91 @@ export class UserController {
     @Query('username') username: string,
     @Query('email') email: string,
     @Query('password') password: string,
+    @Session() session: any,
   ) {
+    if (session.userID) throw new ConflictException('You are logged in.');
     let user: User;
     try {
-      user = await this.authService.login(username?.length ? username: email, password);
-      
-    } catch(ex) {
-      if(ex instanceof EntityNotFoundException)
-        if(username?.length)
-          throw new NotFoundException(`No user with this username:${username} found.`)
+      user = await this.authService.login(
+        username?.length ? username : email,
+        password,
+      );
+    } catch (ex) {
+      if (ex instanceof EntityNotFoundException)
+        if (username?.length)
+          throw new NotFoundException(
+            `No user with this username:${username} found.`,
+          );
         else
-          throw new NotFoundException(`No user with this email:${email} found.`)
+          throw new NotFoundException(
+            `No user with this email:${email} found.`,
+          );
     }
+    if (!user)
+      throw new ForbiddenException(
+        'Cannot login because of wrong credentials.',
+      );
+    session.userID = user.id;
+    return user;
+  }
+
+  @Post('/login')
+  async loginByPost(
+    @Body() body: LoginUserDto,
+    @Session() session: any,
+    @Res() response: Response
+  ) {
+    if (session.userID) throw new ConflictException('You are logged in.');
+    let user: User;
+    const {username, email, password} = body;
+    try {
+      user = await this.authService.login(
+        username?.length ? username : email,
+        password,
+      );
+    } catch (ex) {
+      if (ex instanceof EntityNotFoundException)
+        if (username?.length)
+          throw new NotFoundException(
+            `No user with this username:${username} found.`,
+          );
+        else
+          throw new NotFoundException(
+            `No user with this email:${email} found.`,
+          );
+    }
+    if (!user)
+      throw new ForbiddenException(
+        'Cannot login because of wrong credentials.',
+      );
+    session.userID = user.id;
+    delete user.password; // No credential interceptor doesnt work here.
+    response.status(HttpStatus.OK)
+        .send("Successful.\n" + JSON.stringify(user));
+  }
+
+  @Get('/whoami')
+  async whoami(@Session() session: any) {
+    if (!session.userID)
+      throw new UnauthorizedException(
+        'You are not logged in to find out who you are!',
+      );
+    const { userID } = session;
+    const user = await this.userService.findOne(userID);
     if(!user)
-      throw new ForbiddenException('Cannot login because of wrong credentials.')
+        throw new NotFoundException('User not found');
     return user;
   }
   // @UseInterceptors(ClassSerializerInterceptor)
   // @UseInterceptors(UserSerializerInterceptor)
+
+  @Post('/logout')
+  async logout(@Session() session: any, @Res() response: Response) {
+    session.userID = null;
+    // return "Successfully logged out.";
+    response.status(HttpStatus.OK)
+      .send("Successfully logged out.");
+  }
   @Get('/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.userService.findOne(+id); // or parseInt
