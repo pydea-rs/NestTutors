@@ -13,7 +13,7 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
+  // UseInterceptors,
   ClassSerializerInterceptor,
   ForbiddenException,
   Session,
@@ -21,7 +21,8 @@ import {
   UnauthorizedException,
   Res,
   HttpStatus,
-  Request
+  Request,
+  UseGuards
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PostUserDto } from 'src/dtos/post-user.dto';
@@ -33,13 +34,14 @@ import { AuthService } from './auth.service';
 import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
 import { Response } from 'express';
 import { LoginUserDto } from 'src/dtos/login-user.dto';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+// import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('user')
 // @UseInterceptors(new UserSerializerInterceptor(UserDto))
 @NoCredentialsUserSerialize(UserDto)
-@UseInterceptors(CurrentUserInterceptor)
+// @UseInterceptors(CurrentUserInterceptor)
 export class UserController {
   constructor(
     private userService: UserService,
@@ -70,7 +72,7 @@ export class UserController {
     @Query('password') password: string,
     @Session() session: any,
   ) {
-    if (session.userID) throw new ConflictException('You are logged in.');
+    if (session?.userID) throw new ConflictException('You are logged in.');
     let user: User;
     try {
       user = await this.authService.login(
@@ -144,6 +146,7 @@ export class UserController {
   // @UseInterceptors(UserSerializerInterceptor)
 
   @Get('/whoami')
+  @UseGuards(AuthGuard)
   async whoami(@CurrentUser() user: User) {
     return user;
   }
@@ -194,6 +197,7 @@ export class UserController {
 
   // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
+  @UseGuards(AuthGuard)
   async updateUser(@CurrentUser() user: User, @Param('id') id: string, @Body() body: PatchUserDto) {
     if(+id !== user.id)
       throw new UnauthorizedException('You are not allowed to modify other users\'s data!');
