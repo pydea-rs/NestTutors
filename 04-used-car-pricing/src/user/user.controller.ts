@@ -22,7 +22,8 @@ import {
   Res,
   HttpStatus,
   Request,
-  UseGuards
+  UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PostUserDto } from 'src/dtos/post-user.dto';
@@ -37,6 +38,7 @@ import { LoginUserDto } from 'src/dtos/login-user.dto';
 // import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { STATUS_CODES } from 'http';
 
 @Controller('user')
 // @UseInterceptors(new UserSerializerInterceptor(UserDto))
@@ -98,15 +100,12 @@ export class UserController {
     return user;
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post('/login')
-  async loginByPost(
-    @Body() body: LoginUserDto,
-    @Session() session: any,
-    @Res() response: Response
-  ) {
+  async loginByPost(@Body() body: LoginUserDto, @Session() session: any) {
     if (session.userID) throw new ConflictException('You are logged in.');
     let user: User;
-    const {username, email, password} = body;
+    const { username, email, password } = body;
     try {
       user = await this.authService.login(
         username?.length ? username : email,
@@ -128,9 +127,7 @@ export class UserController {
         'Cannot login because of wrong credentials.',
       );
     session.userID = user.id;
-    delete user.password; // No credential interceptor doesnt work here.
-    response.status(HttpStatus.OK)
-        .send("Successful.\n" + JSON.stringify(user));
+    return user;
   }
 
   // by Request decorator and direct use of CurrentUserInterceptor
@@ -155,8 +152,7 @@ export class UserController {
   async logout(@Session() session: any, @Res() response: Response) {
     session.userID = null;
     // return "Successfully logged out.";
-    response.status(HttpStatus.OK)
-      .send("Successfully logged out.");
+    response.status(HttpStatus.OK).send('Successfully logged out.');
   }
   @Get('/:id')
   async getUser(@Param('id') id: string) {
@@ -198,9 +194,15 @@ export class UserController {
   // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
   @UseGuards(AuthGuard)
-  async updateUser(@CurrentUser() user: User, @Param('id') id: string, @Body() body: PatchUserDto) {
-    if(+id !== user.id)
-      throw new UnauthorizedException('You are not allowed to modify other users\'s data!');
+  async updateUser(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Body() body: PatchUserDto,
+  ) {
+    if (+id !== user.id)
+      throw new UnauthorizedException(
+        "You are not allowed to modify other users's data!",
+      );
     try {
       user = await this.userService.update(user, body); // actually its not necessary to assign return value to user, but whatever!
       //   delete user.password; // removing delete password section, cause of using Exclude and CLassSerializerInterceptor
@@ -217,12 +219,14 @@ export class UserController {
   @NoCredentialsUserSerialize(JustNameUserDto)
   @Delete('/:id')
   async deleteUser(@CurrentUser() user: User, @Param('id') id: string) {
-    if(+id !== user.id)
-      throw new UnauthorizedException('You are not allowed to remove other users\'s!');
+    if (+id !== user.id)
+      throw new UnauthorizedException(
+        "You are not allowed to remove other users's!",
+      );
     try {
       await this.userService.remove(user);
       //   delete user.password; // removing delete password section, cause of using Exclude and CLassSerializerInterceptor
-      return "Successfully Removed.";
+      return 'Successfully Removed.';
     } catch (err) {
       // unused, for using userService.removeById
       if (err instanceof EntityNotFoundException)
