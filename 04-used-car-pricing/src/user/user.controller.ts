@@ -34,6 +34,7 @@ import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
 import { Response } from 'express';
 import { LoginUserDto } from 'src/dtos/login-user.dto';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('user')
 // @UseInterceptors(new UserSerializerInterceptor(UserDto))
@@ -130,16 +131,22 @@ export class UserController {
         .send("Successful.\n" + JSON.stringify(user));
   }
 
-  @Get('/whoami')
-  async whoami(@Request() request: any, @Session() session: any) {
-    if (!session.userID)
-      throw new UnauthorizedException(
-        'You are not logged in to find out who you are!',
-      );
-    return request.currentUser;
-  }
+  // by Request decorator and direct use of CurrentUserInterceptor
+  // @Get('/whoami')
+  // async whoami(@Request() request: any, @Session() session: any) {
+  //   if (!session.userID)
+  //     throw new UnauthorizedException(
+  //       'You are not logged in to find out who you are!',
+  //     );
+  //   return request.currentUser;
+  // }
   // @UseInterceptors(ClassSerializerInterceptor)
   // @UseInterceptors(UserSerializerInterceptor)
+
+  @Get('/whoami')
+  async whoami(@CurrentUser() user: User) {
+    return user;
+  }
 
   @Post('/logout')
   async logout(@Session() session: any, @Res() response: Response) {
@@ -187,12 +194,15 @@ export class UserController {
 
   // @UseInterceptors(ClassSerializerInterceptor)
   @Patch('/:id')
-  async updateUser(@Param('id') id: string, @Body() body: PatchUserDto) {
+  async updateUser(@CurrentUser() user: User, @Param('id') id: string, @Body() body: PatchUserDto) {
+    if(+id !== user.id)
+      throw new UnauthorizedException('You are not allowed to modify other users\'s data!');
     try {
-      const user = await this.userService.update(+id, body);
+      user = await this.userService.update(user, body); // actually its not necessary to assign return value to user, but whatever!
       //   delete user.password; // removing delete password section, cause of using Exclude and CLassSerializerInterceptor
       return user;
     } catch (err) {
+      // unused, for using userService.updateById
       if (err instanceof EntityNotFoundException)
         throw new NotFoundException('No user with this id found to update!');
     }
@@ -202,12 +212,15 @@ export class UserController {
   // @UseInterceptors(ClassSerializerInterceptor)
   @NoCredentialsUserSerialize(JustNameUserDto)
   @Delete('/:id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@CurrentUser() user: User, @Param('id') id: string) {
+    if(+id !== user.id)
+      throw new UnauthorizedException('You are not allowed to remove other users\'s!');
     try {
-      const user = await this.userService.remove(+id);
+      await this.userService.remove(user);
       //   delete user.password; // removing delete password section, cause of using Exclude and CLassSerializerInterceptor
-      return user;
+      return "Successfully Removed.";
     } catch (err) {
+      // unused, for using userService.removeById
       if (err instanceof EntityNotFoundException)
         throw new NotFoundException('No user with this id found to remove!');
     }

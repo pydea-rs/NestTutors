@@ -38,17 +38,21 @@ export class UserService {
         return Promise.resolve([]);
     }
 
-    async update(id: number, fields: Partial<User>) {
+    async updateById(id: number, fields: Partial<User>) {
         // Notice: Reason for not using repo.update directly, is that that way Hooks dont execute. And there may other works that should be done in between.
         const user = await this.findOne(id);
         if(!user) {
             throw new EntityNotFoundException('User');
         }
+        return this.update(user, fields);
+    }
+
+    update(user: User, fields: Partial<User>) {
         Object.assign(user, fields);
         return this.userRepository.save(user);
     }
 
-    async remove(id: number) {
+    async removeById(id: number) {
         // Other approach is using delete. That does the job directly but as mentioned in update section about .update,
         // this delete method doesnt run Hooks too.
         const user = await this.findOne(id);
@@ -57,5 +61,9 @@ export class UserService {
         }
 
         return this.userRepository.remove(user); // remove & save and maybe run some hooks
+    }
+
+    remove(user: User) {
+        return this.userRepository.remove(user);
     }
 }

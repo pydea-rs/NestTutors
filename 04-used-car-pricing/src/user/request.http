@@ -46,7 +46,7 @@ Content-Type: application/json
 }
 
 ### Update a user, multiple changes:
-PATCH http://localhost:4000/user/4
+PATCH http://localhost:4000/user/1
 Content-Type: application/json
 
 {
@@ -55,4 +55,4 @@ Content-Type: application/json
 }
 
 ### Delete a user
-DELETE http://localhost:4000/user/1
+DELETE http://localhost:4000/user/2
