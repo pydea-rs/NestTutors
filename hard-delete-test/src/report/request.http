@@ -1,0 +1,12 @@
+### Create Report:
+POST http://localhost:4000/report
+Content-Type: application/json
+
+{
+    "color": "blue",
+    "price": 200000,
+    "model": "wha1tever"
+}
+
+### Get All Reports
+GET http://localhost:4000/report
