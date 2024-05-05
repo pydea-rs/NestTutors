@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Get a specific user by id
-GET http://localhost:4000/user/4
+GET http://localhost:4000/user/2
 
 ### Login user:
 GET http://localhost:4000/user/login?username=me&&password=iamhereX_1
@@ -26,7 +26,7 @@ POST http://localhost:4000/user/login
 Content-Type: application/json
 
 {
-    "email": "me@gmail.com",
+    "email": "test@gmail.com",
     "password": "iamhereX_1"
 }
 
@@ -71,7 +71,7 @@ GET http://localhost:4000/user/badge
 
 
 ### Delete Account
-DELETE http://localhost:4000/user/4/delete-account
+DELETE http://localhost:4000/user/3/delete-account
 Content-Type: application/json
 
 {

@@ -83,8 +83,9 @@ export class UserService {
     return this.userRepository.remove(user); // remove & save and maybe run some hooks
   }
 
-  remove(user: User) {
-    return this.userRepository.remove(user);
+  async remove(user: User) {
+    console.log("SOFT REMOVE");
+    return this.userRepository.softRemove(user);
   }
 
   async hardRemove(user: User) {
@@ -98,7 +99,7 @@ export class UserService {
         // now remove every related row to the user from the repo
 
         for (const item of items) {
-          await repo.delete(item);
+          await repo.softRemove(item);
         }
       }
     };
@@ -114,6 +115,6 @@ export class UserService {
     // TOASK: What about Leagues that their starter is this user? remove the whole league!?
 
     // finally remove the user itself
-    return this.userRepository.remove(user);
+    return this.userRepository.softRemove(user);
   }
 }

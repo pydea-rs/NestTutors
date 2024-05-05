@@ -257,6 +257,7 @@ export class UserController {
   // @UseInterceptors(ClassSerializerInterceptor)
   @NoCredentialsUserSerialize(JustNameUserDto)
   @Delete('/:id')
+  @UseGuards(AuthGuard)
   async deleteUser(@CurrentUser() user: User, @Param('id') id: string) {
     if (+id !== user.id)
       throw new UnauthorizedException(

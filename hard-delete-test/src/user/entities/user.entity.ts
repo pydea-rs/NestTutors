@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   AfterInsert,
   AfterUpdate,
+  DeleteDateColumn,
   AfterRemove,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
@@ -37,4 +38,12 @@ export class User {
   logAfterRemove() {
     console.log('This User object has been REMOVED: ', this);
   }
+
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'datetime',
+    default: null,
+  })
+  deletedAt: Date;
+  
 }

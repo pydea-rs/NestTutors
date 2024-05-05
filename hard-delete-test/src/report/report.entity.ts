@@ -1,5 +1,5 @@
 import { User } from 'src/user/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, ManyToOne, JoinColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity()
 export class Report {
@@ -19,7 +19,7 @@ export class Report {
     @Column({ name: 'user_id' })
     userId: number;
   
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {onDelete: "CASCADE", cascade: ['soft-remove', 'remove']})
     @JoinColumn({ name: 'user_id' })
     user: User;
   
@@ -45,4 +45,12 @@ export class Report {
     logAfterRemove() {
       console.log('This Report object has been REMOVED: ', this);
     }
+
+    @DeleteDateColumn({
+      name: 'deleted_at',
+      type: 'datetime',
+      default: null,
+    })
+    deletedAt: Date;
+    
 }

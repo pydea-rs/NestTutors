@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from './user.service';
-import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
+import { EntityExistsException } from '../exceptions/entity-exists.exception';
 import { randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
-import { EntityNotFoundException } from 'src/exceptions/entity-not-found.exception';
+import { EntityNotFoundException } from '../exceptions/entity-not-found.exception';
 
 const ascrypt = promisify(scrypt);
 
