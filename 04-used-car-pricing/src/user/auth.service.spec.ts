@@ -13,11 +13,11 @@ describe('UnitTesting AuthService:', () => {
   let users = [];
   beforeEach(async () => {
     fakeUserService = {
-      users: [],
       find: ({ username, email }) => {
         const res = users.find(
           (item) => item.email === email || item.username === username,
         );
+        // or use: users.filter(user => user.email == email)
         return Promise.resolve(res ? [res] : []);
       },
       create: (username: string, email: string, password: string) => {
@@ -65,7 +65,7 @@ describe('UnitTesting AuthService:', () => {
     expect(hash).toEqual(supposedPassword.toString());
   });
 
-  it('test if it prevents registering users with used email', (done) => {
+  it('test if it prevents registering users with used username', (done) => {
     const [user] = users;
     // try {
     //   const {username, email, password} = user;
@@ -81,13 +81,35 @@ describe('UnitTesting AuthService:', () => {
       .catch(() => done());
   });
 
-  it('test if it prevents registering users with used username', (done) => {
+  it('test if it prevents registering users with used email', (done) => {
     const [user] = users;
 
     const { username, email, password } = user;
 
     service
       .register(username + 'X', email, password)
+      .then(() => {})
+      .catch(() => done());
+  });
+
+  it('throws if user signs in with username that not exists', (done) => {
+    service
+      .login('dkljadklajsl', 'adasfasfd')
+      .then(() => {})
+      .catch(() => done());
+  });
+
+  it('throws if user tyrs to sign in with a not existing email', (done) => {
+    service
+      .login('useraedfa@gmail.com', 'sdadas')
+      .then(() => {})
+      .catch(() => done());
+  });
+
+  it('throws if user signs in with an incorrect password', (done) => {
+    const [user] = users;
+    service
+      .login(user.username, 'fdsfasdf')
       .then(() => {})
       .catch(() => done());
   });

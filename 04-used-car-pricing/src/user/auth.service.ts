@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from './user.service';
 import { EntityExistsException } from '../exceptions/entity-exists.exception';
 import { randomBytes, scrypt } from 'crypto';
@@ -37,7 +37,8 @@ export class AuthService {
     if (!user) throw new EntityNotFoundException('User');
     const [salt, hashedPassword] = user.password.split('.');
     const enteredPasswordHashed = await ascrypt(password, salt, 32);
-    if (hashedPassword != enteredPasswordHashed) return null;
+    if (hashedPassword != enteredPasswordHashed) 
+      throw new BadRequestException('Invalid password provided.'); // kust for test purposes.
     return user;
   }
 }
