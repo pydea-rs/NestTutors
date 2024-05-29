@@ -26,18 +26,18 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { PostUserDto } from 'src/dtos/post-user.dto';
+import { PostUserDto } from '../dtos/post-user.dto';
 import { User } from './user.entity';
-import { PatchUserDto } from 'src/dtos/patch-user.dto';
-import { UserDto } from 'src/dtos/user.dto';
-import { JustNameUserDto } from 'src/dtos/just-name-user.dto';
+import { PatchUserDto } from '../dtos/patch-user.dto';
+import { UserDto } from '../dtos/user.dto';
+import { JustNameUserDto } from '../dtos/just-name-user.dto';
 import { AuthService } from './auth.service';
-import { EntityExistsException } from 'src/exceptions/entity-exists.exception';
+import { EntityExistsException } from '../exceptions/entity-exists.exception';
 import { Response } from 'express';
-import { LoginUserDto } from 'src/dtos/login-user.dto';
+import { LoginUserDto } from '../dtos/login-user.dto';
 // import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
 import { STATUS_CODES } from 'http';
 
 @Controller('user')
